@@ -33,7 +33,7 @@ namespace BloggingPlatform.Controllers
 
             var singlePost = await context.Post
                         .Where(post => post.PostIdentifier == slug)
-                        .Select(post => new ReturnPostModel(post, post.PostTag.Select(postTag => postTag.Tag.TagName).ToArray()))
+                        .Select(post => new BlogPostModel(post, post.PostTag.Select(postTag => postTag.Tag.TagName).ToArray()))
                         .FirstOrDefaultAsync();
 
             if (singlePost == null)
@@ -59,7 +59,7 @@ namespace BloggingPlatform.Controllers
             var posts = await context.Post
                         .OrderByDescending(post => post.PostUpdated)
                         .Where(post => tag==null || post.PostTag.Select(postTag => postTag.Tag.TagName).Contains(tag))
-                        .Select(post => new ReturnPostModel(post, post.PostTag.Select(postTag => postTag.Tag.TagName).ToArray()))
+                        .Select(post => new BlogPostModel(post, post.PostTag.Select(postTag => postTag.Tag.TagName).ToArray()))
                         .ToArrayAsync();
 
             if (posts == null)
@@ -74,21 +74,26 @@ namespace BloggingPlatform.Controllers
             });
         }
 
-        // PUT: api/Posts/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost([FromRoute] int id, [FromBody] Post post)
+        // PUT: api/posts/:slug
+        [HttpPut("{slug}")]
+        public async Task<IActionResult> PutPost([FromRoute] string slug, [FromBody] BlogPostModel post)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+            ValidateSlug(ref post);
+            Post postForUpdate = await context.Post
+                                    .Where(blogPost => blogPost.PostIdentifier == slug)
+                                    .SingleOrDefaultAsync();
 
-            if (id != post.PostId)
+            if (postForUpdate == null || 
+                (post.title=="" && post.description=="" && post.body==""))
             {
                 return BadRequest();
             }
 
-            context.Entry(post).State = EntityState.Modified;
+            postForUpdate.updateFields(post);
 
             try
             {
@@ -96,7 +101,7 @@ namespace BloggingPlatform.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PostExists(id))
+                if (!PostExists(slug))
                 {
                     return NotFound();
                 }
@@ -106,34 +111,30 @@ namespace BloggingPlatform.Controllers
                 }
             }
 
-            return NoContent();
+            BlogPostModel updatedPost = await context.Post
+                                        .Where(blogPost => blogPost.PostId == postForUpdate.PostId)
+                                        .Select(blogPost => new BlogPostModel(blogPost, blogPost.PostTag.Select(postTag => postTag.Tag.TagName).ToArray()))
+                                        .SingleOrDefaultAsync();
+            return Ok(updatedPost);
         }
 
-        // POST: api/Posts
+        // POST: api/posts
         [HttpPost]
-        public async Task<IActionResult> PostPost([FromBody] NewPostModel post)
+        public async Task<IActionResult> PostPost([FromBody] BlogPostModel post)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            SlugHelper helper = new SlugHelper();
-            Post newPost = new Post
-            {
-                PostIdentifier = helper.GenerateSlug(post.title),
-                PostTitle = post.title,
-                PostDescription = post.description,
-                PostBody = post.body,
-                PostCreated = DateTime.Now,
-                PostUpdated = DateTime.Now
-            };
-
+            ValidateSlug(ref post);
+            Post newPost = new Post(post);
             context.Post.Add(newPost);
 
             foreach (var tag in post.tagList)
             {
                 Tag newTag = await context.Tag.SingleOrDefaultAsync(postTag => postTag.TagName == tag);
+
                 if (newTag == null)
                 {
                     newTag = new Tag
@@ -152,7 +153,7 @@ namespace BloggingPlatform.Controllers
 
             await context.SaveChangesAsync();
 
-            return Ok(new ReturnPostModel(newPost, post.tagList));
+            return Ok(new BlogPostModel(newPost, post.tagList));
         }
 
         // DELETE: api/posts/:slug
@@ -165,6 +166,7 @@ namespace BloggingPlatform.Controllers
             }
 
             Post post = await context.Post.SingleOrDefaultAsync(blogPost => blogPost.PostIdentifier == slug);
+
             if (post == null)
             {
                 return NotFound();
@@ -175,13 +177,6 @@ namespace BloggingPlatform.Controllers
                         .Select(postTag => postTag.TagId)
                         .ToArray();
 
-            Console.Write("IDS for " + post.PostTitle + " "+ids.Length);
-            foreach (int id in ids)
-            {
-                Console.Write(id + " ");
-            }
-
-            Console.WriteLine();
             foreach (int id in ids)
             {
                 if (!context.PostTag.Any(postTag => postTag.TagId == id && postTag.PostId != post.PostId))
@@ -197,9 +192,23 @@ namespace BloggingPlatform.Controllers
             return StatusCode(200);
         }
 
-        private bool PostExists(int id)
+        private bool PostExists(string slug)
         {
-            return context.Post.Any(e => e.PostId == id);
+            return context.Post.Any(post => post.PostIdentifier == slug);
+        }
+
+        private void ValidateSlug(ref BlogPostModel post)
+        {
+            string title = post.title;
+            int count = context.Post.Count(blogPost => blogPost.PostTitle == title);
+            int num = context.Post
+                        .OrderByDescending(blogPost => blogPost.PostId)
+                        .Select(blogPost => blogPost.PostId)
+                        .FirstOrDefault();
+
+            SlugHelper helper = new SlugHelper();
+            if (count > 0) title+=" " + ++num;
+            post.slug = helper.GenerateSlug(title);
         }
     }
 }
