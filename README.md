@@ -25,4 +25,4 @@ To run this solution follow these steps:
 * In Visual Studio 2017 go to `File` > `Open` > `Project/Solution` and select **BloggingPlatform.sln** from directory where you cloned/downloaded the repository
 
    * Open **application.json** and set database name you defined in SMSS (optionally set your SQL server). If your database name is **BPDB**, then in database connection string you should set: *"Server=.\\SQLEXPRESS;Database=__BPDB__;Trusted_Connection=True;"*
-   * Use `F5` or go `Debug` > `Start debugging`
+   * Use `F5` or go `Debug` > `Start debugging` to run the solution
