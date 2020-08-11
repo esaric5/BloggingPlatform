@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BloggingPlatform.Models
+﻿namespace BloggingPlatform.Models
 {
     public partial class PostTag
     {

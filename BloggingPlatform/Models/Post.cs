@@ -1,5 +1,4 @@
-﻿using Slugify;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace BloggingPlatform.Models
@@ -23,7 +22,6 @@ namespace BloggingPlatform.Models
 
         public Post(BlogPostModel post)
         {
-            SlugHelper helper = new SlugHelper();
             PostIdentifier = post.slug;
             PostTitle = post.title;
             PostDescription = post.description;
@@ -34,7 +32,6 @@ namespace BloggingPlatform.Models
 
         public void updateFields (BlogPostModel post)
         {
-            //SlugHelper helper = new SlugHelper();
             PostTitle = updateField(PostTitle, post.title);
             PostIdentifier = updateField(PostIdentifier, post.slug);
             PostDescription = updateField(PostDescription, post.description);
