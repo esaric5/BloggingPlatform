@@ -4,13 +4,14 @@ namespace BloggingPlatform.Models
 {
     public class BlogPostModel
     {
+        public static readonly string dateFormat = "yyyy-mm-ddThh:mm:ss.fffZ";
         public string slug { get; set; } = "";
         public string title { get; set; } = "";
         public string description { get; set; } = "";
         public string body { get; set; } = "";
         public string[] tagList { get; set; } = new string[0];
-        public DateTime createdAt { get; set; } = DateTime.UtcNow.ToUniversalTime();
-        public DateTime updatedAt { get; set; } = DateTime.UtcNow.ToUniversalTime();
+        public string createdAt { get; set; } = DateTime.UtcNow.ToString(dateFormat);
+        public string updatedAt { get; set; } = DateTime.UtcNow.ToString(dateFormat);
 
         public BlogPostModel()
         {
@@ -24,8 +25,8 @@ namespace BloggingPlatform.Models
             description = post.PostDescription;
             body = post.PostBody;
             tagList = tagArray;
-            createdAt = post.PostCreated;
-            updatedAt = post.PostUpdated;
+            createdAt = post.PostCreated.ToString(dateFormat);
+            updatedAt = post.PostUpdated.ToString(dateFormat);
         }
     }
 }
