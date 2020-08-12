@@ -32,8 +32,8 @@ namespace BloggingPlatform.Models
 
         public void updateFields (BlogPostModel post)
         {
+            if (!PostTitle.Equals(post.title)) PostIdentifier = updateField(PostIdentifier, post.slug);
             PostTitle = updateField(PostTitle, post.title);
-            PostIdentifier = updateField(PostIdentifier, post.slug);
             PostDescription = updateField(PostDescription, post.description);
             PostBody = updateField(PostBody, post.body);
             PostUpdated = DateTime.UtcNow;
