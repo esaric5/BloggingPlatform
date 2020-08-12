@@ -1,8 +1,8 @@
 ## Recommended tools
 To follow up with these instruction use:
-1. Visual Studio 2017
-1. Microsoft SQL Server 2019
-1. Microsoft SQL Server Managment Studio (SMSS)
+* Visual Studio 2017
+* Microsoft SQL Server 2019
+* Microsoft SQL Server Managment Studio (SMSS)
 
 For addition information you can email me at *esaric5@gmail.com*
 ## Build and Run Instructions
