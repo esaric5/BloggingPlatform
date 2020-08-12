@@ -1,10 +1,11 @@
 ## Recommended tools
-To follow up with these instruction use:
+To follow up with these instructions use:
 * Visual Studio 2017
 * Microsoft SQL Server 2019
 * Microsoft SQL Server Managment Studio (SMSS)
 
-For addition information you can email me at *esaric5@gmail.com*
+For additional information you can email me at *esaric5@gmail.com*
+
 ## Build and Run Instructions
 To run this solution follow these steps:
 
@@ -25,4 +26,5 @@ To run this solution follow these steps:
 * In Visual Studio 2017 go to `File` > `Open` > `Project/Solution` and select **BloggingPlatform.sln** from directory where you cloned/downloaded the repository
 
    * Open **application.json** and set database name you defined in SMSS (optionally set your SQL server). If your database name is **BPDB**, then in database connection string you should set: *"Server=.\\SQLEXPRESS;Database=__BPDB__;Trusted_Connection=True;"*
+   
    * Run the solution with `F5` or go `Debug` > `Start debugging`
